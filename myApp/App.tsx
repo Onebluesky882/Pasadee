@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import React from "react";
 import Header from "./components/ui/Header";
-import HomeScreen from "./screens/HomeScreen";
+import HomePage from "./screens/Home";
 import Profile from "./screens/Profile";
 const Tab = createBottomTabNavigator();
 export default function App() {
@@ -17,11 +17,7 @@ export default function App() {
             headerTitle: () => <Header />,
           }}
         >
-          <Tab.Screen
-            name="Home"
-            component={HomeScreen}
-            // options={{ title: "home" }}
-          />
+          <Tab.Screen name="Home" component={HomePage} />
           <Tab.Screen
             name="profile"
             component={Profile}

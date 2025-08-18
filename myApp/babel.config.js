@@ -11,9 +11,8 @@ module.exports = function (api) {
       ],
       "nativewind/babel",
     ],
-
     plugins: [
-      "react-native-reanimated/plugin", // หรือ "react-native-worklets/plugin" ถ้าใช้ Reanimated v3+
+      "react-native-worklets/plugin", // <-- update here
       [
         "module-resolver",
         {
