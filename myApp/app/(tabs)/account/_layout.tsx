@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
-const screenOne = () => {
+const _layout = () => {
   return (
     <View>
-      <Text>screenOne</Text>
+      <Text>_layout</Text>
     </View>
   );
 };
-export default screenOne;
+export default _layout;

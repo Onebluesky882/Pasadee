@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
-const index = () => {
+const _layout = () => {
   return (
     <View>
-      <Text>index</Text>
+      <Text>_layout</Text>
     </View>
   );
 };
-export default index;
+export default _layout;
