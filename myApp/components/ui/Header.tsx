@@ -1,5 +1,5 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { Text } from "react-native";
 import { Box } from "./box";
@@ -13,7 +13,7 @@ export default function Header() {
     { name: "search1" },
   ] as const;
 
-  const route = useRoute();
+  const navigation = useNavigation<any>();
   return (
     <Box className="flex-row   justify-between items-center  w-full ">
       {/*     <Box className="flex-row items-center justify-between w-full px-4 py-3 border-b border-gray-200 bg-white"> */}
@@ -24,6 +24,7 @@ export default function Header() {
         {menuItems.map(item => (
           <Pressable key={item.name} onPress={() => setActive(item.name)}>
             <AntDesign
+              onPress={() => navigation.navigate("greeting")}
               name={item.name}
               size={24}
               color={active === item.name ? "blue" : "black"}
