@@ -1,9 +1,9 @@
-import { Text, View } from "react-native";
+import { Slot } from "expo-router";
 const _layout = () => {
   return (
-    <View>
-      <Text>Home</Text>
-    </View>
+    <>
+      <Slot />
+    </>
   );
 };
 export default _layout;
