@@ -9,7 +9,7 @@ const imagesSlider = [
 export default function Home() {
   return (
     <Box>
-      <SliderCard data={imagesSlider} />;
+      <SliderCard data={imagesSlider} />
     </Box>
   );
 }

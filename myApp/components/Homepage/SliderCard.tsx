@@ -14,10 +14,9 @@ type Props = {
 const SliderCard = ({ data }: Props) => {
   const height = 300;
   const width = Dimensions.get("screen").width;
-
   return (
-    <Box className="  w-full">
-      <Box className="  overflow-hidden">
+    <Box className="  w-full ">
+      <Box className="overflow-hidden">
         <Carousel
           width={width}
           loop={true}
