@@ -6,9 +6,11 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DATABASE_CONNECTION } from './database/database-connection';
 import { DatabaseModule } from './database/database.module';
+import { OpenaiModule } from './openai/openai.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    OpenaiModule,
     DatabaseModule,
     AuthModule.forRootAsync({
       imports: [DatabaseModule],
