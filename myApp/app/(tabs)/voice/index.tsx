@@ -1,9 +1,9 @@
 import { Text, View } from "react-native";
-const _layout = () => {
+const voice = () => {
   return (
     <View>
-      <Text>_layout</Text>
+      <Text>voice</Text>
     </View>
   );
 };
-export default _layout;
+export default voice;
