@@ -16,27 +16,32 @@ const SliderCard = ({ data }: Props) => {
   const width = Dimensions.get("screen").width;
   return (
     <Box className="  w-full ">
-      <Box className="overflow-hidden">
-        <Carousel
-          width={width}
-          loop={true}
-          height={258}
-          snapEnabled={true}
-          autoPlay={true}
-          pagingEnabled={true}
-          autoPlayInterval={5000}
-          data={data as any}
-          renderItem={({ item }: CarouselRenderItemInfo<{ image: string }>) => (
+      <Carousel
+        width={width}
+        loop={true}
+        height={258}
+        snapEnabled={true}
+        pagingEnabled={true}
+        autoPlay={true}
+        autoPlayInterval={5000}
+        data={data as any}
+        mode="parallax"
+        modeConfig={{
+          parallaxScrollingScale: 0.9,
+          parallaxScrollingOffset: 50,
+        }}
+        renderItem={({ item }: CarouselRenderItemInfo<{ image: string }>) => (
+          <Box className="rounded-lg overflow-hidden">
             <Image
               source={item.image}
-              resizeMode="contain"
+              resizeMode="cover"
               alt="slider"
               width={width}
-              height={height}
+              height={258}
             />
-          )}
-        />
-      </Box>
+          </Box>
+        )}
+      />
     </Box>
   );
 };
