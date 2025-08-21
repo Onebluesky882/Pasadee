@@ -51,6 +51,14 @@ const _layout = () => {
           tabBarIcon: ({ color }) => <TabBarIcon name={"user"} color={color} />,
         }}
       />
+
+      <Tabs.Screen
+        name="screen"
+        options={{
+          href: null,
+          headerShadowVisible: false,
+        }}
+      />
     </Tabs>
   );
 };
