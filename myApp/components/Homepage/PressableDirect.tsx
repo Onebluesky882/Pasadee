@@ -2,9 +2,9 @@ import { Box } from "@gluestack-ui/themed";
 import { Pressable, Text } from "react-native";
 
 type Props = {
-  pathName: string;
+  pathName?: string;
   onPress: () => void;
-  bg: string;
+  bg?: string;
 };
 const PressableDirect = ({ onPress, pathName, bg }: Props) => {
   return (
