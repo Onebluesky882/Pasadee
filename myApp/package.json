@@ -26,6 +26,7 @@
     "Ionicons": "link:@expo/vector-icons/Ionicons",
     "axios": "^1.11.0",
     "babel-plugin-module-resolver": "^5.0.2",
+    "better-auth": "^1.3.7",
     "dotenv": "^17.2.1",
     "expo": "^53.0.20",
     "expo-constants": "^17.1.7",
