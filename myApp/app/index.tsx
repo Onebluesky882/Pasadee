@@ -7,7 +7,7 @@ const index = () => {
   return (
     <>
       {redirect ? (
-        <Redirect href="/conversation" />
+        <Redirect href="/(tabs)" />
       ) : (
         <View
           className="flex justify-center items-center h-full"
