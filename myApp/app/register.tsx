@@ -8,11 +8,17 @@ export default function Register() {
   const router = useRouter();
   const { control, handleSubmit } = useForm();
 
-  const onSubmit = (data: any) => {
-    console.log("Register data:", data);
-    router.push("/login"); // กลับไปหน้า login หลังสมัคร
+  const onSubmit = async (data: any) => {
+    try {
+      console.log("success :", data);
+    } catch (error) {
+      console.error(" signup failed:", error);
+    }
+
+    // router.push("/login"); // กลับไปหน้า login หลังสมัคร
   };
 
+  const SubmitForm = async () => {};
   return (
     <Box className="flex-1 justify-center items-center bg-gray-50 px-5">
       <Text className="text-2xl font-bold mb-6">Sign Up</Text>
@@ -22,7 +28,12 @@ export default function Register() {
         name="name"
         render={({ field: { onChange, value } }) => (
           <Input>
-            <InputField placeholder="Full Name" />
+            <InputField
+              placeholder="username"
+              value={value}
+              onChange={onChange}
+              type="text"
+            />
           </Input>
         )}
       />
@@ -32,7 +43,12 @@ export default function Register() {
         name="email"
         render={({ field: { onChange, value } }) => (
           <Input>
-            <InputField placeholder="Full Name" />
+            <InputField
+              placeholder="email"
+              value={value}
+              onChange={onChange}
+              type="text"
+            />
           </Input>
         )}
       />
@@ -42,7 +58,12 @@ export default function Register() {
         name="password"
         render={({ field: { onChange, value } }) => (
           <Input>
-            <InputField placeholder="Full Name" />
+            <InputField
+              placeholder="password"
+              type="password"
+              value={value}
+              onChange={onChange}
+            />
           </Input>
         )}
       />

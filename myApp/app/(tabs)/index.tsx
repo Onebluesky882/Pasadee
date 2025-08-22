@@ -27,8 +27,8 @@ export default function Home() {
         <HStack space="md" className="mt-2 justify-center">
           <PressableDirect
             pathName={"Vocabulary Game"}
+            bg={"yellow"}
             onPress={() => router.push("/(tabs)/screen/vocabulary")}
-            bg={"pink"}
           />
           <PressableDirect
             pathName={"Read and Write"}
@@ -37,22 +37,21 @@ export default function Home() {
           />
         </HStack>
 
-        {/* Section 3 - 3 items */}
         <HStack space="md" className="mt-2">
           <PressableDirect
             bg={"green"}
             pathName={"Conversation 1:1"}
-            onPress={() => router.push("/(tabs)/screen/vocabulary")}
+            onPress={() => router.push("/(tabs)/screen/conversation")}
           />
           <PressableDirect
             bg={"purple"}
             pathName={"Q & A Test"}
-            onPress={() => router.push("/(tabs)/screen/vocabulary")}
+            onPress={() => router.push("/(tabs)/screen/question-answer")}
           />
           <PressableDirect
             bg={"yellow"}
-            pathName={" Lesson English"}
-            onPress={() => router.push("/(tabs)/screen/vocabulary")}
+            pathName={"English lesson"}
+            onPress={() => router.push("/(tabs)/screen/english-lesson")}
           />
         </HStack>
       </Box>

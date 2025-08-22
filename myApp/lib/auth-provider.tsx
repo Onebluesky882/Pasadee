@@ -1,7 +1,6 @@
 "use client";
-
+// doc https://www.better-auth.com/docs/integrations/expo
 import { createContext, ReactNode, useContext } from "react";
-import { authClient } from "./auth-client";
 
 interface AuthContextType {
   session: { user?: { id: string; email: string; name: string } } | null;
@@ -11,12 +10,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data: session, isPending: isLoading } = authClient.useSession();
+  // const { data: session, isPending: isLoading } = authClient.useSession();
 
   return (
-    <AuthContext.Provider value={{ session, isLoading }}>
-      {children}
-    </AuthContext.Provider>
+    <></>
+    // <AuthContext.Provider value={{ session, isLoading }}>
+    //   {children}
+    // </AuthContext.Provider>
   );
 }
 

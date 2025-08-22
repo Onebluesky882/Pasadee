@@ -1,15 +1,12 @@
-import { ConfigContext, ExpoConfig } from "@expo/config";
-import "dotenv/config";
-
-export default ({ config }: ConfigContext): ExpoConfig => {
-  return {
-    ...config,
-    name: "MyApp",
-    slug: "my-app",
-    version: "1.0.0",
-    extra: {
-      API_URL: process.env.API_URL,
-      API_KEY: process.env.API_KEY,
-    },
-  };
-};
+import { ConfigContext, ExpoConfig } from "expo/config";
+export default ({ config }: ConfigContext): ExpoConfig => ({
+  ...config,
+  name: "myApp",
+  slug: "myApp",
+  scheme: "myapp",
+  platforms: ["ios", "android", "web"],
+  version: "1.0.0",
+  extra: {
+    apiUrl: "http://192.168.1.49:3001",
+  },
+});
