@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <Box className="flex justify-center">
       <SliderCard data={imagesSlider} />
-      <Text>Welcome, {session?.user.name}</Text>;{/*  section 2*/}
+      {session && <Text>Welcome, {session?.user.name}</Text>}
       {/*  section 3 box*/}
       <Box className="mx-4 my-4 space-y-4  ">
         {/* Section 1 */}

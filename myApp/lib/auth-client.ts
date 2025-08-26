@@ -5,7 +5,7 @@ import * as SecureStore from "expo-secure-store";
 
 // 1️⃣ สร้าง authClient
 export const authClient = createAuthClient({
-  baseURL: "http://192.168.1.53:3001/api/auth", // backend LAN IP + path
+  baseURL: "http://192.168.1.53:3008/api/auth", // backend LAN IP + path
   plugins: [
     expoClient({
       scheme: "myapp", // ใช้สำหรับ deep link / redirect

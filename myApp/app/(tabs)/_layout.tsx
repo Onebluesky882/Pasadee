@@ -1,4 +1,4 @@
-import { HeaderLeft, HeaderRight } from "@/components/tabsLayout";
+import { HeaderLeft, HeaderRight } from "@/components/header";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";

@@ -1,16 +1,24 @@
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Box, Pressable } from "@gluestack-ui/themed";
+import { Box, Pressable, Text } from "@gluestack-ui/themed";
 
 import { useRouter } from "expo-router";
 import React from "react";
+import { authClient } from "../../lib/auth-client";
+
 export const HeaderRight = () => {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
+
   return (
     <Box className="    p-2 ">
-      <Pressable onPress={() => router.push("/register")}>
-        <Feather name="user" size={24} color="black" />
-      </Pressable>
+      {session ? (
+        <Text>{session.user.name}</Text>
+      ) : (
+        <Pressable onPress={() => router.push("/login")}>
+          <Feather name="user" size={24} color="black" />
+        </Pressable>
+      )}
     </Box>
   );
 };
