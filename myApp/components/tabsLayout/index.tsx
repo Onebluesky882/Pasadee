@@ -8,7 +8,7 @@ export const HeaderRight = () => {
   const router = useRouter();
   return (
     <Box className="    p-2 ">
-      <Pressable onPress={() => router.push("/login")}>
+      <Pressable onPress={() => router.push("/register")}>
         <Feather name="user" size={24} color="black" />
       </Pressable>
     </Box>

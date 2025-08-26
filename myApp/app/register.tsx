@@ -8,11 +8,12 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    await authClient.signUp.email({
+    const data = await authClient.signUp.email({
       email,
       password,
       name,
     });
+    console.log("data", data);
   };
 
   return (
@@ -24,7 +25,7 @@ export default function SignUp() {
         value={password}
         onChangeText={setPassword}
       />
-      <Button title="Login" onPress={handleLogin} />
+      <Button title="Signup" onPress={handleLogin} />
     </View>
   );
 }

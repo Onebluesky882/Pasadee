@@ -26,8 +26,9 @@ import { OpenaiModule } from './openai/openai.module';
           },
           trustedOrigins: [
             'http://localhost:8001',
-            'https://192.168.1.53:8081',
             'http://192.168.1.53:8081',
+            'http://192.168.1.53:19006',
+            'myapp://192.168.1.53:19000',
           ],
         }),
       }),

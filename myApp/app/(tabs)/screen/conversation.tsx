@@ -1,4 +1,3 @@
-import { TeacherSVG } from "@/components/lottie";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Box, Pressable, SafeAreaView } from "@gluestack-ui/themed";
 import { Audio } from "expo-av";
@@ -77,8 +76,6 @@ const conversation = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <Box className="flex-1">
         <Box className="flex-1 bg-gray-200">
-          <TeacherSVG />
-
           <Box className="flex items-center p-2">
             <Pressable onPress={toggleOpenMic}>
               <FontAwesome
