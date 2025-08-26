@@ -14,7 +14,7 @@ const imagesSlider = [
 ];
 export default function Home() {
   const { data: session } = authClient.useSession();
-  console.log("session", session);
+
   const router = useRouter();
   return (
     <Box className="flex justify-center">

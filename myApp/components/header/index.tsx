@@ -8,8 +8,10 @@ import { authClient } from "../../lib/auth-client";
 
 export const HeaderRight = () => {
   const router = useRouter();
+
   const { data: session } = authClient.useSession();
 
+  console.log("userName :", session);
   return (
     <Box className="    p-2 ">
       {session ? (
@@ -24,9 +26,12 @@ export const HeaderRight = () => {
 };
 
 export const HeaderLeft = () => {
+  const logOut = authClient.signOut();
   return (
     <Box className="    p-2  ">
-      <Ionicons name="menu" size={24} color="black" />
+      <Pressable onPress={() => logOut}>
+        <Ionicons name="menu" size={24} color="black" />
+      </Pressable>
     </Box>
   );
 };

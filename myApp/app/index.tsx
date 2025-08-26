@@ -1,36 +1,31 @@
 import { Button, ButtonText } from "@gluestack-ui/themed";
-import { Link, Redirect } from "expo-router";
-import { useState } from "react";
+import { Link } from "expo-router";
 import { Image, StyleSheet, Text, View } from "react-native";
+
 const index = () => {
-  const [redirect, setRedirect] = useState(true);
   return (
     <>
-      {redirect ? (
-        <Redirect href="/(tabs)" />
-      ) : (
-        <View
-          className="flex justify-center items-center h-full"
-          style={style.container}
-        >
-          <Text style={style.title}>Pasadee</Text>
-          <View>
-            <Image
-              source={require("../assets/images/cover.png")}
-              resizeMode="cover"
-            />
-          </View>
-          <View className="p-5">
-            <Text className="text-3xl">Hi, How are you today!</Text>
-          </View>
-
-          <Link href={"/(tabs)"} asChild>
-            <Button style={style.button}>
-              <ButtonText>get started</ButtonText>
-            </Button>
-          </Link>
+      <View
+        className="flex justify-center items-center h-full"
+        style={style.container}
+      >
+        <Text style={style.title}>Pasadee</Text>
+        <View>
+          <Image
+            source={require("../assets/images/cover.png")}
+            resizeMode="cover"
+          />
         </View>
-      )}
+        <View className="p-5">
+          <Text className="text-3xl">Hi, How are you today!</Text>
+        </View>
+
+        <Link href={"/(tabs)"} asChild>
+          <Button style={style.button}>
+            <ButtonText>get started</ButtonText>
+          </Button>
+        </Link>
+      </View>
     </>
   );
 };

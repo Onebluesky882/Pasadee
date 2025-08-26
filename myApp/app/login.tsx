@@ -12,23 +12,25 @@ export default function SignIn() {
       const { data: session } = await authClient.getSession();
       if (session) {
         router.push("/(tabs)");
+        if (session) router.push("/(tabs)");
       }
     };
     fetchUser();
   }, []);
 
   const handleLogin = async () => {
-    const data = await authClient.signIn.email({
+    const { data: session, error } = await authClient.signIn.email({
       email,
       password,
     });
-    console.log("data", data);
+    if (error) {
+      console.log("error login", error);
+    }
+    if (session) {
+      router.push("/(tabs)");
+    }
   };
-  const input = {
-    email: email,
-    password: password,
-  };
-  console.log("input", input);
+
   return (
     <View>
       <TextInput placeholder="Email" value={email} onChangeText={setEmail} />
