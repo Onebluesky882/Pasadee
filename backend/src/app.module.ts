@@ -24,7 +24,11 @@ import { OpenaiModule } from './openai/openai.module';
           emailAndPassword: {
             enabled: true,
           },
-          trustedOrigins: ['http://localhost:8001', '192.168.1.49:8081'],
+          trustedOrigins: [
+            'http://localhost:8001',
+            'https://192.168.1.53:8081',
+            'http://192.168.1.53:8081',
+          ],
         }),
       }),
       inject: [DATABASE_CONNECTION],
