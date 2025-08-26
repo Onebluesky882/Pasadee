@@ -4,18 +4,14 @@ import { ConfigModule } from '@nestjs/config';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { AppController } from './app.controller';
 import { DATABASE_CONNECTION } from './database/database-connection';
 import { DatabaseModule } from './database/database.module';
-import { OpenaiModule } from './openai/openai.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    OpenaiModule,
     DatabaseModule,
     AuthModule.forRootAsync({
       imports: [DatabaseModule],
-
       useFactory: (database: NodePgDatabase) => ({
         auth: betterAuth({
           database: drizzleAdapter(database, {
@@ -24,17 +20,14 @@ import { OpenaiModule } from './openai/openai.module';
           emailAndPassword: {
             enabled: true,
           },
-          trustedOrigins: [
-            'http://localhost:8001',
-            'http://192.168.1.53:8081',
-            'http://192.168.1.53:19006',
-            'myapp://192.168.1.53:19000',
-          ],
+
+          // iphone simulator
+          // my ip : 192.168.1.53
+          trustedOrigins: ['http://192.168.1.53:3000'],
         }),
       }),
       inject: [DATABASE_CONNECTION],
     }),
   ],
-  controllers: [AppController],
 })
 export class AppModule {}
