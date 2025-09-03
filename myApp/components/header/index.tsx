@@ -1,7 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { Box, Pressable, Text } from "@gluestack-ui/themed";
 
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import React from "react";
 import { authClient } from "../../lib/auth-client";
@@ -26,10 +26,9 @@ export const HeaderRight = () => {
 };
 
 export const HeaderLeft = () => {
-  const logOut = authClient.signOut();
   return (
     <Box className="    p-2  ">
-      <Pressable onPress={() => logOut}>
+      <Pressable>
         <Ionicons name="menu" size={24} color="black" />
       </Pressable>
     </Box>

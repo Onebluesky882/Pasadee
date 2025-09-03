@@ -5,7 +5,6 @@ import React from "react";
 import PressableDirect from "@/components/Homepage/PressableDirect";
 import SliderCard from "@/components/Homepage/SliderCard";
 import { HStack } from "@/components/ui/hstack";
-import { authClient } from "@/lib/auth-client";
 
 const imagesSlider = [
   { id: 1, image: require("@/assets/images/1.png") },
@@ -13,18 +12,16 @@ const imagesSlider = [
   { id: 3, image: require("@/assets/images/3.png") },
 ];
 export default function Home() {
-  const { data: session } = authClient.useSession();
-
   const router = useRouter();
   return (
     <Box className="flex justify-center">
       <SliderCard data={imagesSlider} />
-      {session && <Text>Welcome, {session?.user.name}</Text>}
+
       {/*  section 3 box*/}
       <Box className="mx-4 my-4 space-y-4  ">
         {/* Section 1 */}
         <Box className="border border-gray-300 rounded-lg p-4 shadow bg-white items-center justify-center">
-          <Text className="text-lg font-bold">Program</Text>
+          <Text className="text-lg font-bold">Program hello</Text>
         </Box>
 
         {/* Section 2 - 2 items */}

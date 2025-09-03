@@ -1,4 +1,5 @@
 import { authClient } from "@/lib/auth-client";
+import { router } from "expo-router/build/imperative-api";
 import { useState } from "react";
 import { Button, TextInput, View } from "react-native";
 
@@ -6,14 +7,17 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleLogin = async () => {
-    const data = await authClient.signUp.email({
+  const handleSignup = async () => {
+    await authClient.signUp.email({
       email,
       password,
       name,
     });
-    console.log("data", data);
+
+    const session = await authClient.getSession();
+    if (session) {
+      router.push("/(tabs)");
+    }
   };
 
   return (
@@ -25,7 +29,7 @@ export default function SignUp() {
         value={password}
         onChangeText={setPassword}
       />
-      <Button title="Signup" onPress={handleLogin} />
+      <Button title="Signup" onPress={handleSignup} />
     </View>
   );
 }

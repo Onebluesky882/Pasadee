@@ -11,6 +11,7 @@ export default function SignIn() {
     const fetchUser = async () => {
       const { data: session } = await authClient.getSession();
       if (session) {
+        authClient;
         router.push("/(tabs)");
         if (session) router.push("/(tabs)");
       }
