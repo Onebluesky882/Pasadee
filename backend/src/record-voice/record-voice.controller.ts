@@ -78,12 +78,30 @@ export class RecordVoiceController {
       const transcription = await this.client.audio.transcriptions.create({
         file: fs.createReadStream(tempPath),
         model: 'whisper-1',
+        prompt:
+          'Please transcribe only in English. Do not respond in Thai or other languages.',
       });
+
+      // สร้าง prompt สำหรับ GPT TTS
+      const teacherPrompt = `
+You are an English teacher helping a beginner student.
+
+- Focus on simple words and short sentences.
+- Correct the student's English gently, do not insist on perfect grammar.
+- Ask follow-up questions ONLY about vocabulary or sentences in the student's speech to encourage learning.
+- Do NOT go beyond the scope of the conversation or introduce unrelated topics.
+- Make learning fun and engaging.
+- Prioritize understanding and speaking over correctness.
+- Give examples the student can repeat easily.
+
+Student said: "${transcription.text}"
+AI:
+`;
 
       const tts = await this.client.audio.speech.create({
         model: 'gpt-4o-mini-tts',
+        input: teacherPrompt,
         voice: 'alloy',
-        input: transcription.text,
       });
 
       fs.unlinkSync(tempPath);
