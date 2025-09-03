@@ -6,11 +6,13 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DATABASE_CONNECTION } from './database/database-connection';
 import { DatabaseModule } from './database/database.module';
+import { OpenaiModule } from './openai/openai.module';
 import { RecordVoiceController } from './record-voice/record-voice.controller';
-import { RecordVoiceService } from './record-voice/record-voice.service';
 import { RecordVoiceModule } from './record-voice/record-voice.module';
+import { RecordVoiceService } from './record-voice/record-voice.service';
 @Module({
   imports: [
+    OpenaiModule,
     ConfigModule.forRoot(),
     DatabaseModule,
     AuthModule.forRootAsync({
@@ -26,7 +28,7 @@ import { RecordVoiceModule } from './record-voice/record-voice.module';
 
           // iphone simulator
           // my ip : 192.168.1.53
-          trustedOrigins: ['http://192.168.1.53:3000'],
+          trustedOrigins: ['http://192.168.1.49:3000'],
         }),
       }),
       inject: [DATABASE_CONNECTION],
