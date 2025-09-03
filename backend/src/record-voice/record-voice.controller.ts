@@ -34,8 +34,6 @@ export class RecordVoiceController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async uploadAudio(@UploadedFile() file: Express.Multer.File) {
-    console.log('receive file', file.originalname);
-
     if (!file) {
       console.log('No file received');
       return { error: 'no file uploaded' };

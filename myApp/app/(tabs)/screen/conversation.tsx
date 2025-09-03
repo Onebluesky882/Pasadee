@@ -9,7 +9,7 @@ import { Audio } from "expo-av";
 import { useEffect, useState } from "react";
 import { Alert, Button, StyleSheet, View } from "react-native";
 
-export default function App() {
+export default function index() {
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recorderState = useAudioRecorderState(audioRecorder);
 
