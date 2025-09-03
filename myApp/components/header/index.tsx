@@ -11,7 +11,6 @@ export const HeaderRight = () => {
 
   const { data: session } = authClient.useSession();
 
-  console.log("userName :", session);
   return (
     <Box className="    p-2 ">
       {session ? (

@@ -19,6 +19,7 @@ const _layout = () => {
   return (
     <Tabs
       screenOptions={{
+        headerTitle: "",
         headerRight: () => <HeaderRight />,
         headerLeft: () => <HeaderLeft />,
       }}
@@ -27,6 +28,7 @@ const _layout = () => {
         name="index"
         options={{
           title: "Home",
+
           tabBarIcon: ({ color }) => <TabBarIcon name={"home"} color={color} />,
         }}
       />
