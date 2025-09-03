@@ -6,6 +6,9 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DATABASE_CONNECTION } from './database/database-connection';
 import { DatabaseModule } from './database/database.module';
+import { RecordVoiceController } from './record-voice/record-voice.controller';
+import { RecordVoiceService } from './record-voice/record-voice.service';
+import { RecordVoiceModule } from './record-voice/record-voice.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -28,6 +31,9 @@ import { DatabaseModule } from './database/database.module';
       }),
       inject: [DATABASE_CONNECTION],
     }),
+    RecordVoiceModule,
   ],
+  controllers: [RecordVoiceController],
+  providers: [RecordVoiceService],
 })
 export class AppModule {}
