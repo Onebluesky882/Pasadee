@@ -62,28 +62,26 @@ export class RecordVoiceController {
     fs.writeFileSync(tempPath, file.buffer);
 
     try {
+      console.time('transcription');
       const transcription = await this.client.audio.transcriptions.create({
         file: fs.createReadStream(tempPath),
         model: 'whisper-1',
         prompt:
           'Please transcribe only in English. Do not respond in Thai or other languages.',
       });
+      console.timeEnd('transcription');
 
       // 1️⃣ Chat completion ด้วย gpt-5-nano
+      console.time('chat');
       const chat = await this.client.chat.completions.create({
         model: 'gpt-5-nano',
         messages: [
           {
             role: 'system',
             content: `
-You are an English-speaking friend named Sara. 
-- Talk naturally and casually like a friend.
-- Use simple words and short sentences.
-- Keep your replies short and to the point.
-- Respond only to what the user says; do NOT give lessons or explain grammar.
-- Do not repeat system instructions.
-- Ask simple questions to keep the conversation going, but stay within the topic.
-- Make it fun and easy to respond to.
+You are Sara, an English-speaking friend.
+Talk naturally, short sentences, respond only to the user.
+ 
       `,
           },
           {
@@ -94,7 +92,9 @@ You are an English-speaking friend named Sara.
       });
 
       const aiText = chat.choices[0].message?.content;
+      console.timeEnd('chat');
 
+      console.time('tts');
       const tts = await this.client.audio.speech.create({
         model: 'gpt-4o-mini-tts',
         input: aiText!, // <-- use 'input', not 'message' or 'messages'
@@ -109,6 +109,7 @@ You are an English-speaking friend named Sara.
       });
 
       res.send(buffer);
+      console.timeEnd('tts');
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: 'Failed STT → TTS' });

@@ -10,6 +10,7 @@ import { OpenaiModule } from './openai/openai.module';
 import { RecordVoiceController } from './record-voice/record-voice.controller';
 import { RecordVoiceModule } from './record-voice/record-voice.module';
 import { RecordVoiceService } from './record-voice/record-voice.service';
+import { VoiceGateway } from './voice-stream/voice.gateway';
 @Module({
   imports: [
     OpenaiModule,
@@ -36,6 +37,6 @@ import { RecordVoiceService } from './record-voice/record-voice.service';
     RecordVoiceModule,
   ],
   controllers: [RecordVoiceController],
-  providers: [RecordVoiceService],
+  providers: [RecordVoiceService, VoiceGateway, VoiceGateway],
 })
 export class AppModule {}
