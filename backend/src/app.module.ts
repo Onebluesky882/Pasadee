@@ -7,9 +7,6 @@ import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DATABASE_CONNECTION } from './database/database-connection';
 import { DatabaseModule } from './database/database.module';
 import { OpenaiModule } from './openai/openai.module';
-import { RecordVoiceController } from './record-voice/record-voice.controller';
-import { RecordVoiceModule } from './record-voice/record-voice.module';
-import { RecordVoiceService } from './record-voice/record-voice.service';
 import { VoiceGateway } from './voice-stream/voice.gateway';
 @Module({
   imports: [
@@ -34,9 +31,7 @@ import { VoiceGateway } from './voice-stream/voice.gateway';
       }),
       inject: [DATABASE_CONNECTION],
     }),
-    RecordVoiceModule,
   ],
-  controllers: [RecordVoiceController],
-  providers: [RecordVoiceService, VoiceGateway, VoiceGateway],
+  providers: [VoiceGateway, VoiceGateway],
 })
 export class AppModule {}

@@ -17,10 +17,11 @@ export class VoiceGateway {
     this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
   @SubscribeMessage('audio-chunk')
-  async handleAudioChunk(client: any, payload: Buffer) {
+  async handleAudioChunk(client: any, payload: { base64: string }) {
     // 1️⃣ ส่ง chunk ไป Whisper streaming API
+    const buffer = Buffer.from(payload.base64, 'base64');
     const tempPath = path.join(process.cwd(), `chunk-${Date.now()}.m4a`);
-    fs.writeFileSync(tempPath, payload);
+    fs.writeFileSync(tempPath, buffer);
 
     // 2️⃣ Transcribe chunk
     const transcriptionChunk = await this.openai.audio.transcriptions.create({

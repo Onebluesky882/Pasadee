@@ -1,117 +1,99 @@
-import { Buffer } from "buffer";
-import {
-  AudioModule,
-  RecordingPresets,
-  setAudioModeAsync,
-  useAudioRecorder,
-  useAudioRecorderState,
-} from "expo-audio";
+import { View } from "@gluestack-ui/themed";
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
-import { useEffect } from "react";
-import { Alert, Button, StyleSheet, View } from "react-native";
-import API from "../../../api/record-voice";
+import { useEffect, useRef, useState } from "react";
+import { Button, StyleSheet } from "react-native";
+import { Socket, io } from "socket.io-client";
 
-export default function Index() {
-  const audioRecorder = useAudioRecorder(RecordingPresets.LOW_QUALITY);
-  const recorderState = useAudioRecorderState(audioRecorder);
-
+export default function index() {
+  const [isRecording, setIsRecording] = useState(false);
+  const recordingRef = useRef<Audio.Recording | null>(null);
+  const socketRef = useRef<Socket | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [sound, setSound] = useState<Audio.Recording | null>(null);
+  const rec = new Audio.Recording();
   useEffect(() => {
-    (async () => {
-      const status = await AudioModule.requestRecordingPermissionsAsync();
-      if (!status.granted) {
-        Alert.alert("Permission to access microphone was denied");
-      }
+    socketRef.current = io("http://localhost:3008/api/ws/voice");
+    socketRef.current.on("connect", () =>
+      console.log("connected", socketRef.current?.id)
+    );
 
-      await setAudioModeAsync({
-        allowsRecording: true,
-        playsInSilentMode: true,
-      });
-    })();
+    socketRef.current.on("disconnect", () => {
+      console.log("Socket disconnected");
+    });
+
+    return () => {
+      socketRef.current?.disconnect();
+    };
   }, []);
 
-  const record = async () => {
-    try {
-      await audioRecorder.prepareToRecordAsync();
-      audioRecorder.record();
-    } catch (error) {
-      console.error("Failed to start recording:", error);
+  // 🔹 Start recording and send chunks every 1s
+  const startRecording = async () => {
+    console.log("Requesting permissions...");
+
+    const { granted } = await Audio.requestPermissionsAsync();
+    if (!granted) {
+      console.warn("Permission not granted!");
+      return;
     }
-  };
+    console.log("Starting recording...");
+    const rec = new Audio.Recording();
 
-  const stopRecordingAndSend = async (audioUri: string) => {
-    // ตรวจสอบนามสกุลไฟล์
-    const ext = audioUri.endsWith(".m4a") ? "m4a" : "mp3";
-    const type = ext === "m4a" ? "audio/m4a" : "audio/mpeg";
+    await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.LOW_QUALITY);
+    await rec.startAsync();
+    recordingRef.current = rec;
+    setIsRecording(true);
+    console.log("Recording started");
 
-    const formData = new FormData();
-    formData.append("file", {
-      uri: audioUri,
-      type,
-      name: `recording.${ext}`,
-    } as any);
-
-    try {
-      const res = await API.post("record-voice/stt-tts", formData, {
-        responseType: "arraybuffer",
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      // แปลง ArrayBuffer → Base64
-      const base64 = Buffer.from(res.data).toString("base64");
-
-      // เขียนไฟล์ลง cache
-      const fileUri = FileSystem.cacheDirectory + "speech.mp3";
-      await FileSystem.writeAsStringAsync(fileUri, base64, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      // เล่นเสียง
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: `file://${fileUri}` },
-        { shouldPlay: true }
-      );
-      await sound.playAsync();
-
-      return sound;
-    } catch (error) {
-      console.error("TTS failed:", error);
-      return null;
-    }
-  };
-
-  const handlePress = async () => {
-    if (recorderState.isRecording) {
-      try {
-        await audioRecorder.stop();
-        recorderState.isRecording = false;
-
-        if (audioRecorder.uri) {
-          await stopRecordingAndSend(audioRecorder.uri);
+    intervalRef.current = setInterval(async () => {
+      const uri = rec.getURI();
+      if (uri) {
+        try {
+          const base64 = await FileSystem.readAsStringAsync(uri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          const buffer = Buffer.from(base64, "base64");
+          console.log("Emit audio chunk, size:", base64.length);
+          socketRef.current?.emit("audio-chunk", { base64 });
+        } catch (error) {
+          console.error("Chunk error:", error);
         }
-      } catch (error) {
-        console.error("Stop recording failed:", error);
       }
-    } else {
-      await record();
+    }, 2000);
+    console.log("Recording started!");
+  };
+
+  const stopRecording = async () => {
+    if (!recordingRef.current) return;
+
+    await recordingRef.current.stopAndUnloadAsync();
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
+
+    const uri = recordingRef.current.getURI();
+    console.log("Recording stopped. File saved at:", uri);
+
+    setIsRecording(false);
+    recordingRef.current = null;
   };
 
   return (
     <View style={styles.container}>
       <Button
-        title={recorderState.isRecording ? "Stop Recording" : "Start Recording"}
-        onPress={handlePress}
+        title={isRecording ? "Stop Recording" : "Start Recording"}
+        onPress={isRecording ? stopRecording : startRecording}
       />
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
+    padding: 20,
     backgroundColor: "#ecf0f1",
-    padding: 10,
   },
 });
