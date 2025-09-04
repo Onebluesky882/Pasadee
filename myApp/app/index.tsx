@@ -1,4 +1,4 @@
-import { Button, ButtonText } from "@gluestack-ui/themed";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Link } from "expo-router";
 import { Image, StyleSheet, Text, View } from "react-native";
 
@@ -21,7 +21,7 @@ const index = () => {
         </View>
 
         <Link href={"/(tabs)"} asChild>
-          <Button style={style.button}>
+          <Button variant="solid" size="md" action="primary">
             <ButtonText>get started</ButtonText>
           </Button>
         </Link>
@@ -34,11 +34,6 @@ export default index;
 const style = StyleSheet.create({
   container: {
     backgroundColor: "#fffcf5",
-  },
-  button: {
-    backgroundColor: "#D4BA76",
-    borderRadius: 20,
-    marginTop: 10,
   },
 
   title: {
