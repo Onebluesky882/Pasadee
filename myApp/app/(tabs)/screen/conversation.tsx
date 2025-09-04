@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 import {
   AudioModule,
   RecordingPresets,
@@ -6,23 +7,14 @@ import {
   useAudioRecorderState,
 } from "expo-audio";
 import { Audio } from "expo-av";
-import { useEffect, useState } from "react";
+import * as FileSystem from "expo-file-system";
+import { useEffect } from "react";
 import { Alert, Button, StyleSheet, View } from "react-native";
+import API from "../../../api/record-voice";
 
-export default function index() {
-  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+export default function Index() {
+  const audioRecorder = useAudioRecorder(RecordingPresets.LOW_QUALITY);
   const recorderState = useAudioRecorderState(audioRecorder);
-
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const record = async () => {
-    await audioRecorder.prepareToRecordAsync();
-    audioRecorder.record();
-  };
-
-  const stopRecording = async () => {
-    // The recording will be available on `audioRecorder.uri`.
-    await audioRecorder.stop();
-  };
 
   useEffect(() => {
     (async () => {
@@ -31,43 +23,86 @@ export default function index() {
         Alert.alert("Permission to access microphone was denied");
       }
 
-      setAudioModeAsync({
-        playsInSilentMode: true,
+      await setAudioModeAsync({
         allowsRecording: true,
+        playsInSilentMode: true,
       });
     })();
   }, []);
 
-  const playRecording = async () => {
-    if (!audioRecorder.uri) {
-      Alert.alert("no recording available");
-      return;
+  const record = async () => {
+    try {
+      await audioRecorder.prepareToRecordAsync();
+      audioRecorder.record();
+    } catch (error) {
+      console.error("Failed to start recording:", error);
     }
-
-    if (sound) {
-      await sound.playAsync();
-      setSound(null);
-    }
-
-    const { sound: newSound } = await Audio.Sound.createAsync(
-      {
-        uri: audioRecorder.uri,
-      },
-      { shouldPlay: true }
-    );
-
-    setSound(newSound);
   };
+
+  const stopRecordingAndSend = async (audioUri: string) => {
+    // ตรวจสอบนามสกุลไฟล์
+    const ext = audioUri.endsWith(".m4a") ? "m4a" : "mp3";
+    const type = ext === "m4a" ? "audio/m4a" : "audio/mpeg";
+
+    const formData = new FormData();
+    formData.append("file", {
+      uri: audioUri,
+      type,
+      name: `recording.${ext}`,
+    } as any);
+
+    try {
+      const res = await API.post("record-voice/stt-tts", formData, {
+        responseType: "arraybuffer",
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // แปลง ArrayBuffer → Base64
+      const base64 = Buffer.from(res.data).toString("base64");
+
+      // เขียนไฟล์ลง cache
+      const fileUri = FileSystem.cacheDirectory + "speech.mp3";
+      await FileSystem.writeAsStringAsync(fileUri, base64, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // เล่นเสียง
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: `file://${fileUri}` },
+        { shouldPlay: true }
+      );
+      await sound.playAsync();
+
+      return sound;
+    } catch (error) {
+      console.error("TTS failed:", error);
+      return null;
+    }
+  };
+
+  const handlePress = async () => {
+    if (recorderState.isRecording) {
+      try {
+        await audioRecorder.stop();
+        recorderState.isRecording = false;
+
+        if (audioRecorder.uri) {
+          await stopRecordingAndSend(audioRecorder.uri);
+        }
+      } catch (error) {
+        console.error("Stop recording failed:", error);
+      }
+    } else {
+      await record();
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Button
         title={recorderState.isRecording ? "Stop Recording" : "Start Recording"}
-        onPress={recorderState.isRecording ? stopRecording : record}
+        onPress={handlePress}
       />
-
-      <View>
-        <Button title="Play Recording" onPress={playRecording} />
-      </View>
     </View>
   );
 }

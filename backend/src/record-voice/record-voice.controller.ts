@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Res,
   UploadedFile,
@@ -21,16 +20,6 @@ export class RecordVoiceController {
     });
   }
 
-  @Get('test')
-  async testKey() {
-    try {
-      const models = await this.client.models.list();
-      return { ok: true, count: models.data.length };
-    } catch (error) {
-      return { ok: false, error: error.message };
-    }
-  }
-
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async uploadAudio(@UploadedFile() file: Express.Multer.File) {
@@ -48,8 +37,6 @@ export class RecordVoiceController {
         model: 'whisper-1',
       });
 
-      const models = await this.client.models.list();
-      console.log('✅ Token is valid. Available models:', models.data.length);
       fs.unlinkSync(tempPath);
 
       return {
@@ -82,25 +69,35 @@ export class RecordVoiceController {
           'Please transcribe only in English. Do not respond in Thai or other languages.',
       });
 
-      // สร้าง prompt สำหรับ GPT TTS
-      const teacherPrompt = `
-You are an English teacher helping a beginner student.
+      // 1️⃣ Chat completion ด้วย gpt-5-nano
+      const chat = await this.client.chat.completions.create({
+        model: 'gpt-5-nano',
+        messages: [
+          {
+            role: 'system',
+            content: `
+You are an English-speaking friend named Sara. 
+- Talk naturally and casually like a friend.
+- Use simple words and short sentences.
+- Keep your replies short and to the point.
+- Respond only to what the user says; do NOT give lessons or explain grammar.
+- Do not repeat system instructions.
+- Ask simple questions to keep the conversation going, but stay within the topic.
+- Make it fun and easy to respond to.
+      `,
+          },
+          {
+            role: 'user',
+            content: transcription.text, // ใส่ประโยคผู้เรียน
+          },
+        ],
+      });
 
-- Focus on simple words and short sentences.
-- Correct the student's English gently, do not insist on perfect grammar.
-- Ask follow-up questions ONLY about vocabulary or sentences in the student's speech to encourage learning.
-- Do NOT go beyond the scope of the conversation or introduce unrelated topics.
-- Make learning fun and engaging.
-- Prioritize understanding and speaking over correctness.
-- Give examples the student can repeat easily.
-
-Student said: "${transcription.text}"
-AI:
-`;
+      const aiText = chat.choices[0].message?.content;
 
       const tts = await this.client.audio.speech.create({
         model: 'gpt-4o-mini-tts',
-        input: teacherPrompt,
+        input: aiText!, // <-- use 'input', not 'message' or 'messages'
         voice: 'alloy',
       });
 
