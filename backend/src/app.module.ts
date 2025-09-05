@@ -8,6 +8,8 @@ import { DATABASE_CONNECTION } from './database/database-connection';
 import { DatabaseModule } from './database/database.module';
 import { OpenaiModule } from './openai/openai.module';
 import { VoiceGateway } from './voice-stream/voice.gateway';
+import { VoiceAzureGateway } from './voice-azure/voice-azure.gateway';
+import { VoiceAzureService } from './voice-azure/voice-azure.service';
 @Module({
   imports: [
     OpenaiModule,
@@ -32,6 +34,6 @@ import { VoiceGateway } from './voice-stream/voice.gateway';
       inject: [DATABASE_CONNECTION],
     }),
   ],
-  providers: [VoiceGateway, VoiceGateway],
+  providers: [VoiceGateway, VoiceGateway, VoiceAzureGateway, VoiceAzureService],
 })
 export class AppModule {}
