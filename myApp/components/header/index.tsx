@@ -2,7 +2,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { Box, Pressable, Text } from "@gluestack-ui/themed";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import React from "react";
 import { authClient } from "../../lib/auth-client";
 
@@ -14,7 +14,9 @@ export const HeaderRight = () => {
   return (
     <Box className="    p-2 ">
       {session ? (
-        <Text>{session.user.name}</Text>
+        <Pressable onPress={() => router.push("/logout")}>
+          <Text>{session.user.name}</Text>
+        </Pressable>
       ) : (
         <Pressable onPress={() => router.push("/login")}>
           <Feather name="user" size={24} color="black" />
@@ -27,7 +29,7 @@ export const HeaderRight = () => {
 export const HeaderLeft = () => {
   return (
     <Box className="    p-2  ">
-      <Pressable>
+      <Pressable onPress={() => router.push("/(tabs)")}>
         <Ionicons name="menu" size={24} color="black" />
       </Pressable>
     </Box>
