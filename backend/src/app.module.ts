@@ -4,15 +4,13 @@ import { ConfigModule } from '@nestjs/config';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { AiAgentModule } from './ai-agent/ai-agent.module';
 import { DATABASE_CONNECTION } from './database/database-connection';
 import { DatabaseModule } from './database/database.module';
-import { OpenaiModule } from './openai/openai.module';
-import { VoiceGateway } from './voice-stream/voice.gateway';
-import { VoiceAzureGateway } from './voice-azure/voice-azure.gateway';
-import { VoiceAzureService } from './voice-azure/voice-azure.service';
+import { VoiceStreamingModule } from './voice-streaming/voice-streaming.module';
 @Module({
   imports: [
-    OpenaiModule,
+    VoiceStreamingModule,
     ConfigModule.forRoot(),
     DatabaseModule,
     AuthModule.forRootAsync({
@@ -33,7 +31,8 @@ import { VoiceAzureService } from './voice-azure/voice-azure.service';
       }),
       inject: [DATABASE_CONNECTION],
     }),
+    VoiceStreamingModule,
+    AiAgentModule,
   ],
-  providers: [VoiceGateway, VoiceGateway, VoiceAzureGateway, VoiceAzureService],
 })
 export class AppModule {}
