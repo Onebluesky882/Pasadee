@@ -5,10 +5,11 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { AiAgentModule } from './ai-agent/ai-agent.module';
+import { AudioModule } from './audio/audio.module';
 import { DATABASE_CONNECTION } from './database/database-connection';
 import { DatabaseModule } from './database/database.module';
+import { GroqModule } from './groq/groq.module';
 import { VoiceStreamingModule } from './voice-streaming/voice-streaming.module';
-import { WrtcGateway } from './wrtc/wrtc.gateway';
 @Module({
   imports: [
     VoiceStreamingModule,
@@ -34,7 +35,8 @@ import { WrtcGateway } from './wrtc/wrtc.gateway';
     }),
     VoiceStreamingModule,
     AiAgentModule,
+    AudioModule,
+    GroqModule,
   ],
-  providers: [WrtcGateway],
 })
 export class AppModule {}
