@@ -99,3 +99,13 @@ Analytics → เก็บ log latency (พูด → text → GPT → ตอบ
 🔊 NestJS → ส่งเสียง stream กลับ Expo
 
 📱 Expo → เล่นเสียงออกลำโพง + แสดงข้อความ
+
+Protocol Example (WebSocket)
+// Client → Server
+start { sessionId, sampleRate, mimeType }
+audio-chunk { sessionId, seq, chunkBase64 }
+end { sessionId }
+
+// Server → Client
+tts-chunk { sessionId, seq, chunkBase64 }
+tts-end { sessionId }

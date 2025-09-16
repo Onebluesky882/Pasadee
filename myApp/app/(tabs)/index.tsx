@@ -39,11 +39,11 @@ export default function Home() {
         </HStack>
 
         <HStack space="md" className="mt-2">
-          <PressableDirect
+          {/* <PressableDirect
             bg={"green"}
             pathName={"Conversation 1:1"}
             onPress={() => router.push("/(tabs)/screen/conversation")}
-          />
+          /> */}
           <PressableDirect
             bg={"purple"}
             pathName={"Q & A Test"}

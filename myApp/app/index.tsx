@@ -1,45 +1,85 @@
-import { Button, ButtonText } from "@/components/ui/button";
-import { Link } from "expo-router";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { View } from "@gluestack-ui/themed";
+import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
+import { useRef, useState } from "react";
+import { Button } from "react-native";
+import { socket } from "../lib/socket";
+export default function index() {
+  const sessionId = useRef("session-" + Date.now());
+  const chunkSeq = useRef(0);
+  const [isRecording, setIsRecording] = useState(false);
+  const recordingRef = useRef<Audio.Recording | null>(null);
+  const stopFlag = useRef(false);
+  const isChunkRecording = useRef(false);
+  const startRecordingLoop = async () => {
+    if (isRecording) return;
+    setIsRecording(true);
+    stopFlag.current = false;
+    const { granted } = await Audio.requestPermissionsAsync();
+    if (!granted) {
+      console.warn("❌ Permission denied");
+      return;
+    }
 
-const index = () => {
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: true,
+      staysActiveInBackground: false,
+      playsInSilentModeIOS: true,
+    });
+
+    while (!stopFlag.current) {
+      isChunkRecording.current = true;
+      const chunkRecording = new Audio.Recording();
+
+      try {
+        await chunkRecording.prepareToRecordAsync(
+          Audio.RecordingOptionsPresets.LOW_QUALITY
+        );
+        await chunkRecording.startAsync();
+        console.log("🎙 Recording started");
+
+        // อัด audio 1–2 วิ
+        await new Promise(res => setTimeout(res, 2000));
+
+        // stop momentary (chunk) → read base64 → restart recording
+        await chunkRecording.stopAndUnloadAsync();
+        isChunkRecording.current = false;
+
+        const uri = chunkRecording.getURI();
+
+        if (uri) {
+          const base64 = await FileSystem.readAsStringAsync(uri, {
+            encoding: "base64",
+          });
+
+          socket.emit("audio-chunk", {
+            sessionId: sessionId.current,
+            seq: chunkSeq.current++,
+            chunkBase64: base64,
+          });
+          console.log("📤 Sent chunk", chunkSeq.current);
+        }
+      } catch (error) {
+        console.error("Recording loop error:", error);
+        isChunkRecording.current = false;
+        break;
+      }
+    }
+  };
+
+  const stopRecordingLoop = () => {
+    stopFlag.current = true; // บอก loop ให้หยุดหลัง chunk ปัจจุบัน
+    setIsRecording(false);
+    console.log("Stop requested, loop will stop after current chunk");
+  };
+
   return (
-    <>
-      <View
-        className="flex justify-center items-center h-full"
-        style={style.container}
-      >
-        <Text style={style.title}>Pasadee</Text>
-        <View>
-          <Image
-            source={require("../assets/images/cover.png")}
-            resizeMode="cover"
-          />
-        </View>
-        <View className="p-5">
-          <Text className="text-3xl">Hi, How are you today!</Text>
-        </View>
-
-        <Link href={"/(tabs)"} asChild>
-          <Button variant="solid" size="md" action="primary">
-            <ButtonText>get started</ButtonText>
-          </Button>
-        </Link>
-      </View>
-    </>
+    <View flex={1} className="flex-1 justify-center items-center">
+      <Button
+        title={isRecording ? "Recording..." : "Start Recording"}
+        onPress={startRecordingLoop}
+      />
+      <Button title="Stop" onPress={stopRecordingLoop} />
+    </View>
   );
-};
-export default index;
-
-const style = StyleSheet.create({
-  container: {
-    backgroundColor: "#fffcf5",
-  },
-
-  title: {
-    marginBottom: 20,
-    fontFamily: "InterBold",
-    fontSize: 38,
-    color: "#443C34",
-  },
-});
+}
