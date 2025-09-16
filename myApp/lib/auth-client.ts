@@ -45,19 +45,3 @@ export const fetchAuthenticated = async <T = any>(
   // parse JSON
   return response.json() as Promise<T>;
 };
-
-// 4️⃣ ตัวอย่างใช้งาน
-/*
-import { fetchAuthenticated } from "@/lib/auth-client";
-
-const loadProtectedData = async () => {
-  try {
-    const data = await fetchAuthenticated("http://192.168.1.53:3001/api/secure-endpoint", {
-      method: "GET", // GET request ห้ามมี body
-    });
-    console.log("Protected data:", data);
-  } catch (err) {
-    console.error(err);
-  }
-};
-*/

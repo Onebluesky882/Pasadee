@@ -9,8 +9,6 @@ import { DATABASE_CONNECTION } from './database/database-connection';
 import { DatabaseModule } from './database/database.module';
 import { VoiceStreamingModule } from './voice-streaming/voice-streaming.module';
 import { WrtcGateway } from './wrtc/wrtc.gateway';
-import { WrtcGatewayGateway } from './wrtc-gateway/wrtc-gateway.gateway';
-import { WrtcGateway } from './wrtc/wrtc.gateway';
 @Module({
   imports: [
     VoiceStreamingModule,
@@ -37,6 +35,6 @@ import { WrtcGateway } from './wrtc/wrtc.gateway';
     VoiceStreamingModule,
     AiAgentModule,
   ],
-  providers: [WrtcGateway, WrtcGatewayGateway],
+  providers: [WrtcGateway],
 })
 export class AppModule {}
