@@ -4,7 +4,7 @@ import { Box, Pressable, Text } from "@gluestack-ui/themed";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useRouter } from "expo-router";
 import React from "react";
-import { authClient } from "../../lib/auth-client";
+import { authClient } from "../../services/auth-client";
 
 export const HeaderRight = () => {
   const router = useRouter();

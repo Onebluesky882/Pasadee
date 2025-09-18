@@ -23,6 +23,6 @@ async function bootstrap() {
   expressApp.use(require('express').json());
 
   app.setGlobalPrefix('api');
-  await app.listen(3008, '0.0.0.0');
+  await app.listen(3009, '0.0.0.0');
 }
 bootstrap();

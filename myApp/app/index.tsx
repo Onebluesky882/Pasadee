@@ -3,12 +3,11 @@ import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import { useRef, useState } from "react";
 import { Button } from "react-native";
-import { socket } from "../lib/socket";
+import { socket } from "../services/socket";
 export default function index() {
   const sessionId = useRef("session-" + Date.now());
   const chunkSeq = useRef(0);
   const [isRecording, setIsRecording] = useState(false);
-  const recordingRef = useRef<Audio.Recording | null>(null);
   const stopFlag = useRef(false);
   const isChunkRecording = useRef(false);
   const startRecordingLoop = async () => {

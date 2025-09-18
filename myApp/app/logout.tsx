@@ -3,7 +3,7 @@ import { Box, Pressable } from "@gluestack-ui/themed";
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { authClient } from "../lib/auth-client";
+import { authClient } from "../services/auth-client";
 
 export default function LogoutScreen() {
   const signout = async () => {
