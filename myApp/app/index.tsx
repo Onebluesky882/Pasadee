@@ -3,8 +3,9 @@ import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import { useRef, useState } from "react";
 import { Button } from "react-native";
-import { socket } from "../services/socket";
+import { useWebSocket } from "../hooks/useWebSocket";
 export default function index() {
+  const socket = useWebSocket(state => state.socket);
   const sessionId = useRef("session-" + Date.now());
   const chunkSeq = useRef(0);
   const [isRecording, setIsRecording] = useState(false);
@@ -51,7 +52,7 @@ export default function index() {
             encoding: "base64",
           });
 
-          socket.emit("audio-chunk", {
+          socket?.emit("audio-chunk", {
             sessionId: sessionId.current,
             seq: chunkSeq.current++,
             chunkBase64: base64,
