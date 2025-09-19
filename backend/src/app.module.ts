@@ -27,8 +27,8 @@ import { VoiceStreamingModule } from './voice-streaming/voice-streaming.module';
           },
 
           // iphone simulator
-          // my ip : 192.168.1.53
-          trustedOrigins: ['http://192.168.1.49:3000'],
+          // my ip : 192.168.1.38
+          trustedOrigins: ['http://192.168.1.38:3000'],
         }),
       }),
       inject: [DATABASE_CONNECTION],

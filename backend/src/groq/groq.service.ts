@@ -5,7 +5,7 @@ import Groq from 'groq-sdk';
 export class GroqService {
   private groq: Groq;
 
-  OnModuleInit() {
+  onModuleInit() {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       throw new Error('❌ No GROQ_API_KEY found in environment!');
