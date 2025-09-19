@@ -8,11 +8,14 @@ import {
 import * as fs from 'fs';
 import * as path from 'path';
 import { Server, Socket } from 'socket.io';
-import { AiAgentService } from '../ai-agent/ai-agent.service';
+import { AiAgentService } from '../aiAgent/aiAgent.service';
 import { GroqService } from '../groq/groq.service';
 
 interface SessionData {
   buffers: Buffer[];
+  sampleRate: number;
+  mimeType: string;
+  interval?: ReturnType<typeof setInterval>;
 }
 
 @WebSocketGateway({
@@ -25,8 +28,10 @@ export class AudioGateway {
     private readonly aiAgentService: AiAgentService,
     private readonly groqService: GroqService,
   ) {}
+
   @WebSocketServer()
   server: Server;
+
   private sessions = new Map<string, SessionData>();
 
   handleConnection(client: Socket) {
@@ -34,88 +39,117 @@ export class AudioGateway {
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`client disconnect : ${client.id}`);
+    console.log(`❌ Client disconnected: ${client.id}`);
   }
+
+  // ▶️ Start session
   @SubscribeMessage('start')
   handleStart(
     @MessageBody()
     data: { sessionId: string; sampleRate: number; mimeType: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log(
-      `▶️ Start session request: ${data.sessionId} from client ${client.id}`,
-    );
-    this.sessions.set(data.sessionId, { buffers: [] });
+    const session: SessionData = {
+      buffers: [],
+      sampleRate: data.sampleRate,
+      mimeType: data.mimeType,
+    };
+
+    const uploadDir = path.join(process.cwd(), 'upload');
+    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+    client.join(data.sessionId);
+
+    session.interval = setInterval(async () => {
+      if (session.buffers.length === 0) return;
+
+      const finalBuffer = Buffer.concat(session.buffers);
+
+      try {
+        const filePath = path.join(
+          uploadDir,
+          `${data.sessionId}-${Date.now()}.m4a`,
+        );
+        fs.writeFileSync(filePath, finalBuffer);
+
+        // 1️⃣ Speech-to-Text
+        const transcription =
+          await this.groqService.client.audio.transcriptions.create({
+            file: fs.createReadStream(filePath),
+            model: 'whisper-large-v3-turbo',
+          });
+
+        const userText = transcription.text;
+        client.emit('transcription', {
+          sessionId: data.sessionId,
+          text: userText,
+        });
+
+        // 2️⃣ AI Chat
+        const aiResponse = await this.aiAgentService.askTeacher(
+          data.sessionId,
+          userText,
+        );
+        client.emit('teacher-response', {
+          sessionId: data.sessionId,
+          text: aiResponse,
+        });
+
+        // 3️⃣ Text-to-Speech
+        const ttsBuffer = await this.aiAgentService.textToSpeech(aiResponse);
+        client.emit('teacher-audio', {
+          sessionId: data.sessionId,
+          audioBase64: ttsBuffer.toString('base64'),
+        });
+
+        // cleanup
+        fs.unlinkSync(filePath);
+        session.buffers = [];
+      } catch (err) {
+        console.error('❌ Pipeline error:', err);
+        client.emit('pipeline-error', {
+          sessionId: data.sessionId,
+          error: err.message,
+        });
+      }
+    }, 5000);
+
+    this.sessions.set(data.sessionId, session);
+    console.log(`▶️ Session started: ${data.sessionId}`);
   }
 
-  // listen event audio-chunk
+  // 📥 รับ audio chunk
   @SubscribeMessage('audio-chunk')
-  async handleAudioChunk(
+  handleAudioChunk(
     @MessageBody()
-    data: { sessionId: string; seq: number; chunkBase64: string },
-
-    @ConnectedSocket() client: Socket,
+    data: {
+      sessionId: string;
+      seq: number;
+      chunkBase64: string;
+    },
   ) {
     const session = this.sessions.get(data.sessionId);
-    if (!session) {
-      console.warn(`⚠️ Received chunk for unknown session: ${data.sessionId}`);
-      return;
-    }
+    if (!session) return;
+
     const buffer = Buffer.from(data.chunkBase64, 'base64');
     session.buffers.push(buffer);
     console.log(
-      `📥 Chunk received | sessionId=${data.sessionId} | seq=${data.seq} | size=${buffer.length} bytes`,
+      `📥 Chunk received | sessionId=${data.sessionId} | seq=${data.seq}`,
     );
   }
 
-  @SubscribeMessage('end')
-  async handleEnd(
-    @MessageBody() data: { sessionId: string },
-    @ConnectedSocket() client: Socket,
-  ) {
+  @SubscribeMessage('stop')
+  handleStop(@MessageBody() data: { sessionId: string }) {
     const session = this.sessions.get(data.sessionId);
-    if (!session) {
-      console.warn(`⚠️ End called for unknown session: ${data.sessionId}`);
-      return;
-    }
+    if (!session) return;
 
-    console.log(
-      `🛑 End session: ${data.sessionId}, total chunks=${session.buffers.length}`,
-    );
-    // รวม buffer เสียง
-    const finalBuffer = Buffer.concat(session.buffers);
+    if (session.interval) clearInterval(session.interval);
+    this.sessions.delete(data.sessionId);
 
-    // สร้างโฟลเดอร์ upload
-    const uploadDir = path.join(__dirname, '..', 'upload');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    // เขียนไฟล์จริง
-    const filePath = path.join(uploadDir, `${data.sessionId}.m4a`);
-    fs.writeFileSync(filePath, finalBuffer);
-    console.log(`💾 Saved session audio: ${filePath}`);
-    try {
-      const transcription =
-        await this.groqService.client.audio.transcriptions.create({
-          file: fs.createReadStream(filePath),
-          model: 'whisper-large-v3',
-        });
-      console.log('📝 Transcription:', transcription.text);
+    this.server
+      .to(data.sessionId)
+      .emit('stopped', { sessionId: data.sessionId });
 
-      client.emit('transcription', {
-        sessionId: data.sessionId,
-        text: transcription.text,
-      });
-    } catch (error) {
-      console.error('❌ Pipeline error:', error);
-      client.emit('error', {
-        sessionId: data.sessionId,
-        error: 'Processing failed',
-      });
-    } finally {
-      // cleanup
-      this.sessions.delete(data.sessionId);
-      console.log(`🧹 Session cleaned: ${data.sessionId}`);
-    }
+    console.log(`🛑 Session stopped: ${data.sessionId}`);
   }
 }

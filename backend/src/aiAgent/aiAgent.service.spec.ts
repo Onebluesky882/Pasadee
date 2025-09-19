@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AiAgentService } from './ai-agent.service';
+import { AiAgentService } from './aiAgent.service';
 
 describe('AiAgentService', () => {
   let service: AiAgentService;

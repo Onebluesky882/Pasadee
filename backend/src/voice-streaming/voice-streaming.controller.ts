@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { AiAgentService } from '../ai-agent/ai-agent.service';
+import { AiAgentService } from '../aiAgent/aiAgent.service';
 @Controller('voice-streaming')
 export class VoiceStreamingController {
   private aiAgentService: AiAgentService;

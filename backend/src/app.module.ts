@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { AiAgentModule } from './ai-agent/ai-agent.module';
+import { AiAgentModule } from './aiAgent/aiAgent.module';
 import { AudioModule } from './audio/audio.module';
 import { DATABASE_CONNECTION } from './database/database-connection';
 import { DatabaseModule } from './database/database.module';

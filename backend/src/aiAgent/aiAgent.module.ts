@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { GroqModule } from '../groq/groq.module';
-import { AiAgentService } from './ai-agent.service';
+import { AiAgentService } from './aiAgent.service';
 
 @Module({
   imports: [GroqModule],
