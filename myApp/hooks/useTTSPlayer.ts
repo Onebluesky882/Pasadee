@@ -1,15 +1,17 @@
 import { Audio } from "expo-av";
 import * as FileSystem from "expo-file-system";
 import { useEffect, useRef, useState } from "react";
-import { useWebSocket } from "../../hooks/useWebSocket";
-const TTSPlayer = () => {
+import { useWebSocket } from "./useWebSocket";
+
+export const useTTSPlayer = () => {
   const ttsChunks = useWebSocket(state => state.ttsChunks);
   const resetChunks = useWebSocket(state => state.resetChunks);
-  const [isPlaying, setIsPlaying] = useState(false);
 
+  const [isPlaying, setIsPlaying] = useState(false);
   const queueRef = useRef<string[]>([]);
   const soundRef = useRef<Audio.Sound | null>(null);
 
+  // ✅ auto-run เมื่อมี chunk ใหม่
   useEffect(() => {
     const addNewFiles = async () => {
       for (let i = queueRef.current.length; i < ttsChunks.length; i++) {
@@ -27,7 +29,6 @@ const TTSPlayer = () => {
     addNewFiles();
   }, [ttsChunks]);
 
-  // ฟังก์ชันเล่นเสียงแบบ queue
   const playNext = async () => {
     const nextUri = queueRef.current.shift();
     if (!nextUri) {
@@ -48,30 +49,31 @@ const TTSPlayer = () => {
         if (!status.isLoaded) return;
         if (status.didJustFinish) {
           sound.unloadAsync();
-          playNext(); // เล่นไฟล์ถัดไป
+          playNext();
         }
       });
     } catch (err) {
       console.error("Play error:", err);
-      playNext(); // ข้ามถ้ามี error
+      playNext();
     }
   };
+
+  // ✅ listen tts-end event
   useEffect(() => {
     const socket = useWebSocket.getState().socket;
     if (!socket) return;
 
     socket.on("tts-end", () => {
       console.log("🔚 TTS session ended");
-      resetChunks(); // ล้าง chunks
-      queueRef.current = []; // ล้าง queue
+      resetChunks();
+      queueRef.current = [];
       soundRef.current?.unloadAsync();
     });
 
     return () => {
       socket?.off("tts-end");
     };
-  }, []);
+  }, [resetChunks]);
 
-  return null;
+  return { isPlaying };
 };
-export default TTSPlayer;

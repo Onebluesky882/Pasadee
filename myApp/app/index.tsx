@@ -1,20 +1,22 @@
-import { View } from "@gluestack-ui/themed";
-import { useState } from "react";
+import { Text, View } from "@gluestack-ui/themed";
 import Recorder from "../components/conversation/Recorder";
-import TTSPlayer from "../components/conversation/TTSPlayer";
+import { useRecorder } from "../hooks/useRecorder";
+import { useTTSPlayer } from "../hooks/useTTSPlayer";
 import { useSocketManager } from "../hooks/useWebSocket";
 export default function index() {
-  const [isRecording, setIsRecording] = useState(false);
-
+  const { isRecording, startRecording, stopRecording } = useRecorder();
+  const { isPlaying } = useTTSPlayer();
   useSocketManager();
-  return (
-    // <View style={{ flex: 1 }}>
-    //   <SocketTest />
-    // </View>
 
+  return (
     <View flex={1} className="flex-1 justify-center items-center">
-      <Recorder isRecording={isRecording} setIsRecording={setIsRecording} />
-      <TTSPlayer />
+      <Recorder
+        isRecording={isRecording}
+        startRecording={startRecording}
+        stopRecording={stopRecording}
+      />
+
+      <Text>{isPlaying ? "🎧  playing..." : "Idle"}</Text>
     </View>
   );
 }

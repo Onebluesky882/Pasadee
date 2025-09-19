@@ -38,7 +38,8 @@ export class AudioGateway {
   }
   @SubscribeMessage('start')
   handleStart(
-    @MessageBody() data: { sessionId: string },
+    @MessageBody()
+    data: { sessionId: string; sampleRate: number; mimeType: string },
     @ConnectedSocket() client: Socket,
   ) {
     console.log(
@@ -81,61 +82,36 @@ export class AudioGateway {
     console.log(
       `🛑 End session: ${data.sessionId}, total chunks=${session.buffers.length}`,
     );
-    // รวมไฟล์ เสียง
-    const filePath = path.join(
-      __dirname,
-      '..',
-      'upload',
-      `${data.sessionId}.m4a`,
-    );
+    // รวม buffer เสียง
+    const finalBuffer = Buffer.concat(session.buffers);
 
+    // สร้างโฟลเดอร์ upload
+    const uploadDir = path.join(__dirname, '..', 'upload');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    // เขียนไฟล์จริง
+    const filePath = path.join(uploadDir, `${data.sessionId}.m4a`);
+    fs.writeFileSync(filePath, finalBuffer);
     console.log(`💾 Saved session audio: ${filePath}`);
-
     try {
       const transcription =
-        await this.groqService.client.audio.translations.create({
+        await this.groqService.client.audio.transcriptions.create({
           file: fs.createReadStream(filePath),
           model: 'whisper-large-v3',
         });
-
       console.log('📝 Transcription:', transcription.text);
 
-      // ส่งข้อความกลับ client (optional)
-      // client.emit('transcription', { sessionId: data.sessionId, text });
-
-      //---------------------***------------------------
-
-      // GPT
-      // const reply = await this.aiAgentService.chat(
-      //   [
-      //     { role: 'system', content: 'คุณคือครูสอนภาษาอังกฤษ...' },
-      //     { role: 'user', content: text },
-      //   ],
-      //   'gpt-oss-20b',
-      // );
-      // client.emit('ai-reply', { sessionId: data.sessionId, reply });
-      // console.log('🤖 GPT Reply:', reply);
-
-      //---------------------***------------------------
-      // TTS
-      // const response = await this.groqService.client.audio.speech.create({
-      //   model: 'gpt-4o-mini-tts',
-      //   voice: 'alloy',
-      //   input: reply,
-      // });
-
-      // const nodeStream = Readable.fromWeb(response.body as any);
-      // for await (const chunk of nodeStream) {
-      //   const base64Chunk = Buffer.from(chunk).toString('base64');
-      //   client.emit('tts-chunk', { chunkBase64: base64Chunk });
-      // }
-      // client.emit('tts-end', { sessionId: data.sessionId });
+      client.emit('transcription', {
+        sessionId: data.sessionId,
+        text: transcription.text,
+      });
     } catch (error) {
       console.error('❌ Pipeline error:', error);
-      // client.emit('error', {
-      //   sessionId: data.sessionId,
-      //   error: 'Processing failed',
-      // });
+      client.emit('error', {
+        sessionId: data.sessionId,
+        error: 'Processing failed',
+      });
     } finally {
       // cleanup
       this.sessions.delete(data.sessionId);
