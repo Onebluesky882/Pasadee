@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import * as fs from 'fs';
+import fs from 'fs';
+import fsPromises from 'fs/promises';
 import { ChatCompletionMessageParam } from 'groq-sdk/resources/chat/completions.mjs';
-import * as path from 'path';
+import path from 'path';
 import { GroqService } from '../groq/groq.service';
+
 interface Conversation {
   sessionId: string;
   messages: ChatCompletionMessageParam[];
 }
+
 @Injectable()
 export class AiAgentService {
   private conversations = new Map<string, Conversation>();
@@ -66,14 +69,14 @@ export class AiAgentService {
       });
 
       const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer());
-      fs.writeFileSync(tempFilePath, audioBuffer);
+      await fsPromises.writeFile(tempFilePath, audioBuffer);
 
       return audioBuffer;
     } catch (error) {
       console.error('❌ textToSpeech error:', error);
       return Buffer.from([]);
     } finally {
-      if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
+      if (fs.existsSync(tempFilePath)) await fsPromises.unlink(tempFilePath);
     }
   }
 }
